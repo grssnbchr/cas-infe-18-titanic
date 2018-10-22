@@ -1,2 +1,4 @@
 .idea
 src/*.csv
+output/*.csv
+venv
