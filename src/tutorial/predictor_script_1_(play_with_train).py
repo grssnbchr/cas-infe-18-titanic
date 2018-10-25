@@ -9,7 +9,7 @@ import csv as csv
 import numpy as np
 
 # Open up the CSV file in to a Python object
-with open('../data/titanic3_train.csv', 'r') as f:
+with open('../../data/titanic3_train.csv', 'r') as f:
     csv_file_object = csv.reader(f, delimiter=';') 
     header = next(csv_file_object) #next() just skips the first line holding the column headers
     data=[]

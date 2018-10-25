@@ -3,17 +3,63 @@
 import pandas as pd
 import numpy as np
 import datetime
+# package name is requests-html
+from requests_html import HTMLSession
+import re
+
+
+def get_datetime():
+    '''
+    Returns formatted datetime string for submission
+    :return datetime as string:
+    '''
+    return datetime.datetime.now().isoformat().replace(".", "_").replace(":","_")
 
 
 def write_csv(df):
     '''
     Function to generate output file for upload
-    :param df with id and survived columns:
+    :param df: df with id and survived columns:
     :return:
     '''
     assert isinstance(df, pd.DataFrame)
-    filename = "titanic_"+datetime.datetime.now().isoformat().replace(".", "_").replace(":","_") + ".csv"
+    filename = "titanic_" + get_datetime() + ".csv"
     df[["id", "survived"]].to_csv(filename, sep=";", header=["key", "value"], index = False)
+
+
+def submit_answer(df, custom_name='submission'):
+    '''
+    Function to automagically submit solution df to submission website
+    :param df: df with id and survived columns:
+    :param custom_name: a name to append after team name, e.g. random_forest (should not contain whitespace)
+    :return:
+    '''
+    assert isinstance(df, pd.DataFrame)
+    df_text = df[['id', 'survived']].to_csv(sep=';', header=['key', 'value'], index=False)
+    url = 'https://openwhisk.eu-de.bluemix.net/api/v1/web/SPLab_Scripting/default/titanic.html'
+    payload = {
+        'submission': f'team_8_{custom_name}_{get_datetime()}',
+        'csv': df_text
+    }
+    try:
+        session = HTMLSession()
+        print('submitting solution to server...')
+        # submit
+        res = session.post(url, data=payload)
+        print('submission successful')
+        # get current score and position
+        text = res.text
+        regex = r'<br>(\d+):\s' + re.escape(payload['submission']) + r'\s→\s(\d+\.\d+)<br>'
+        groups = re.search(regex, text)
+        # get current high score
+        highscore_regex = r'<br>1:\s(.+?)→\s(\d+\.\d+)<br>'
+        highscore_groups = re.search(highscore_regex, text)
+        print(f'current score: {round(float(groups[2]), 3)} (position: {groups[1]})')
+        print(f'current highscore: {round(float(highscore_groups[2]), 3)} by "{highscore_groups[1]}"')
+
+    except Exception as e:
+        print(f'error: {e}')
+        quit(1)
 
 
 def prepare_data(train_data):
@@ -71,4 +117,3 @@ def prepare_data(train_data):
     train_data["embarked"] = pd.Categorical(train_data.embarked)
     train_data["embarked"] = train_data.embarked.cat.codes
     return train_data
-

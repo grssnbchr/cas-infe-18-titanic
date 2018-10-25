@@ -8,7 +8,7 @@ Created on Fri Nov 21 20:30:17 2014
 import csv as csv 
 
 # Open up the CSV file into a Python object
-test_file = open('../data/titanic3_test.csv', 'r')
+test_file = open('../../data/titanic3_test.csv', 'r')
 test_file_object = csv.reader(test_file, delimiter=';') 
 header = next(test_file_object)
 

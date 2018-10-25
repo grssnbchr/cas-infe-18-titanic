@@ -12,7 +12,7 @@ from sklearn.ensemble import RandomForestClassifier
 # PART 1: PREPARING THE TRAINING DATA
 
 # Open up the CSV file into a Python object
-with open('../data/titanic3_train.csv', 'r') as f:     # Load the training file
+with open('../../data/titanic3_train.csv', 'r') as f:     # Load the training file
     csv_file_object = csv.reader(f, delimiter=';')
     next(csv_file_object)      # next() skips the first line holding the column headers
     orig_train_data = []
@@ -134,7 +134,7 @@ train_data[0::, 7] = embarked_data[0::].astype(np.float)
 # Now we have to do the same for the test data as we did for the training data
 
 # Open up the CSV file into a Python object
-with open('../data/titanic3_test.csv', 'r') as f:     # Load the test file
+with open('../../data/titanic3_test.csv', 'r') as f:     # Load the test file
     csv_file_object = csv.reader(f, delimiter=';')
     next(csv_file_object)   # next() skips the first line holding the column headers
     orig_test_data = []

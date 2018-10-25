@@ -103,7 +103,7 @@ print("Survival table, rectified:\n", survival_table)
 
 
 #open the test set and a new submission file
-test_file = open('../data/titanic3_test.csv', 'r')
+test_file = open('../../data/titanic3_test.csv', 'r')
 test_file_object = csv.reader(test_file, delimiter=';')
 header = next(test_file_object)
 predictions_file = open("submission2_genderclassbased.csv", "w")
