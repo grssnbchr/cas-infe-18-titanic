@@ -1,6 +1,6 @@
 
 import numpy as np
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
 import pandas as pd
 import titanic_helpers as th
 
@@ -34,22 +34,21 @@ test_ids = orig_test_data["id"]
 # The data is now ready to go. So lets fit to the train, then predict to
 # the test!
 print('Training...')
-forest = RandomForestClassifier(n_estimators=100)
-# Build a forest of trees from the training set (X, y)
-forest = forest.fit(train_data[th.get_predict_cols()], train_data["survived"])
+logreg = LogisticRegression()
+logreg.fit(train_data[th.get_predict_cols()], train_data["survived"])
 
 print('Predicting...')
-output = forest.predict(test_data[th.get_predict_cols()]).astype(np.float)
+y_pred_test = logreg.predict(test_data[th.get_predict_cols()])
 
 # Create DataFrame for outputfile
 df = pd.DataFrame(columns=["id", "survived"])
 df["id"] = test_ids
-df["survived"] = output.astype(int)
+df["survived"] = y_pred_test.astype(int)
 
 # Write the data into a file
 th.write_csv(df=df)
 
 # automagically submit to server
-th.submit_answer(df, custom_name='random_forest_2')
+th.submit_answer(df, custom_name='logistic_regression_2')
 
 print('Done.')
