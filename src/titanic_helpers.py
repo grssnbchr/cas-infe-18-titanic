@@ -70,9 +70,9 @@ def submit_answer(df, custom_name='submission'):
         highscore_regex = r'<br>1:\s(.+?)→\s(\d+\.\d+)<br>'
         highscore_groups = re.search(highscore_regex, text)
         print(f'current score: {round(float(groups[2]), 3)}'
-              '(position: {groups[1]})')
-        print(f'current highscore: {round(float(highscore_groups[2]), 3)} by'
-              '"{highscore_groups[1]}"')
+              f' (position: {groups[1]})')
+        print(f'current highscore: {round(float(highscore_groups[2]), 3)}'
+              f' by "{highscore_groups[1]}"')
 
     except Exception as e:
         print(f'error: {e}')
