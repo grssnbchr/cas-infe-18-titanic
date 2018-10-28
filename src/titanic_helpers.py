@@ -1,6 +1,7 @@
 
 
 import pandas as pd
+import numpy as np
 import datetime
 # package name is requests-html
 from requests_html import HTMLSession
@@ -91,12 +92,12 @@ def prepare_data(train_data):
 
     # Second: store gender data in train_data
     def sex_transformation(row):
-        if row["sex"] == '':
+        if row['sex'] == '' or pd.isna(row['sex']):
             # Most freq. gender is used if 'sex' is undefined
             return most_freq_gender
-        if row["sex"] == 'female':
+        if row['sex'] == 'female':
             return 0
-        if row["sex"] == 'male':
+        if row['sex'] == 'male':
             return 1
 
     train_data["sex"] = train_data.apply(lambda row:
@@ -105,28 +106,28 @@ def prepare_data(train_data):
 
     # AGE: Prepare data 'age' and store it in train_data
     # First: get the median age
-    # Convert 'age' to float, empty values to 0
-
+    # Convert 'age' to float, empty values remain empty
     train_data["age"] = train_data.age.apply(lambda age:
-                                             0 if age == '' else float(age))
+                                             np.nan if (age == '' or pd.isna(age))
+                                             else float(age))
 
     median_age = train_data["age"].median(skipna=True)
 
     # store median age if age is undefined
     train_data["age"] = train_data.age.apply(lambda age:
-                                             median_age if pd.isna(age)
+                                             median_age if (age == '' or pd.isna(age))
                                              else age)
 
     # FARE: Prepare data 'fare' and store it in train_data
     # First: get the 'fare' and 'pclass' data
-    # Convert 'fare' to float, empty values to 0
+    # Convert fare to 0 if NaN or '', so median can be computed
     train_data["fare"] = train_data.fare.apply(lambda fare:
-                                               0 if fare == ''
+                                               0 if (fare == '' or pd.isna(fare))
                                                else float(fare))
-    median_fare = train_data.groupby(["pclass"])["fare"].median(skipna=True)
+    # Assign median fare to each pclass group (3 groups)
+    median_fare = train_data.groupby(["pclass"])["fare"].median(skipna=False)
     train_data["fare"] = train_data.apply(lambda row:
-                                          0 if row["fare"] == 0
-                                          else median_fare[row["pclass"]],
+                                          median_fare[row["pclass"]],
                                           axis=1)
 
     # EMBARKED: Prepare data 'embarked' and store it in train_data
@@ -134,12 +135,14 @@ def prepare_data(train_data):
     embarked_data = train_data.groupby("embarked").size().reset_index(name='N')
     mc_embarked = (embarked_data
                    .embarked[embarked_data.N == max(embarked_data.N)])
+    # extract single value, else the below lambda function does not work
+    mc_embarked = mc_embarked.values[0]
 
     # Second: replace empty entries with the most common 'embarked' value
     train_data["embarked"] = (train_data
                               .embarked
                               .apply(lambda embarked:
-                                     mc_embarked if embarked == ''
+                                     mc_embarked if (embarked == '' or pd.isna(embarked))
                                      else embarked))
 
     # Third: convert all 'embarked' values to int
