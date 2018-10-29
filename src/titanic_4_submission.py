@@ -12,7 +12,7 @@ print("prepare train data...")
 trainFile = "../data/titanic3_train.csv"
 orig_train_data = pd.read_csv(trainFile, delimiter=";")
 train_data = orig_train_data.copy()
-train_data = train_data[th.get_training_cols()]
+train_data = train_data[["survived","pclass","sibsp","parch","sex","age","fare","embarked"]]
 train_data = th.prepare_data(train_data)
 
 # PART 2: PREPARING THE TEST DATA
@@ -23,7 +23,7 @@ print("prepare test data...")
 testFile = "../data/titanic3_test.csv"
 orig_test_data = pd.read_csv(testFile, delimiter=";")
 test_data = orig_test_data.copy()
-test_data = test_data[th.get_predict_cols()]
+test_data = test_data[["pclass","sibsp","parch","sex","age","fare","embarked"]]
 test_data = th.prepare_data(test_data)
 
 # After the training and test data is created, collect the test data's ids
@@ -36,13 +36,13 @@ test_ids = orig_test_data["id"]
 print('Training...')
 forest = RandomForestClassifier(n_estimators=100)
 # Build a forest of trees from the training set (X, y)
-forest = forest.fit(train_data[th.get_predict_cols()], train_data["survived"])
+forest = forest.fit(train_data[["pclass","sibsp","parch","sex","age","fare","embarked"]], train_data["survived"])
 
 print('Predicting...')
-output = forest.predict(test_data[th.get_predict_cols()]).astype(np.float)
+output = forest.predict(test_data[["pclass","sibsp","parch","sex","age","fare","embarked"]]).astype(np.float)
 
 # Create DataFrame for outputfile
-df = pd.DataFrame(columns=["id", "survived"])
+df = pd.DataFrame(columns = ["id","survived"])
 df["id"] = test_ids
 df["survived"] = output.astype(int)
 

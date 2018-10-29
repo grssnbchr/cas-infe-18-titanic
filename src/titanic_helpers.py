@@ -80,92 +80,71 @@ def submit_answer(df, custom_name='submission'):
         quit(1)
 
 
-def prepare_data(train_data):
-    #
+def prepare_data(df):
+    df = prepare_sex(df)
+    df = prepare_age(df)
+    df = prepare_fare(df)
+    df = prepare_embarked(df)
+    return df
+
+
+def prepare_sex(df):
     # SEX: Prepare data 'sex' and store it in train_data
     # First: get the most frequent gender
-
-    num_female = len(train_data[train_data.sex == 'female'])
-    num_male = len(train_data[train_data.sex == 'male'])
+    num_female = len(df[df.sex == 'female'])
+    num_male = len(df[df.sex == 'male'])
     # Set the most frequent gender (female = 0, male = 1)
     most_freq_gender = 0 if num_female >= num_male else 1
-
     # Second: store gender data in train_data
+
     def sex_transformation(row):
         if row['sex'] == '' or pd.isna(row['sex']):
             # Most freq. gender is used if 'sex' is undefined
             return most_freq_gender
         if row['sex'] == 'female':
             return 0
-        if row['sex'] == 'male':
+        if row["sex"] == 'male':
             return 1
+    df["sex"] = df.apply(lambda row: sex_transformation(row), axis=1)
+    return df
 
-    train_data["sex"] = train_data.apply(lambda row:
-                                         sex_transformation(row),
-                                         axis=1)
-
+def prepare_age(df):
     # AGE: Prepare data 'age' and store it in train_data
     # First: get the median age
-    # Convert 'age' to float, empty values remain empty
-    train_data["age"] = train_data.age.apply(lambda age:
+    # Convert 'age' to float, empty values to 0
+    df["age"] = df.age.apply(lambda age:
                                              np.nan if (age == '' or pd.isna(age))
                                              else float(age))
-
-    median_age = train_data["age"].median(skipna=True)
-
-    # store median age if age is undefined
-    train_data["age"] = train_data.age.apply(lambda age:
+    median_age = df["age"].median(skipna = True )
+    #store median age if age is undefined
+    df["age"] = df.age.apply(lambda age:
                                              median_age if (age == '' or pd.isna(age))
                                              else age)
+    return df
 
+
+def prepare_fare(df):
     # FARE: Prepare data 'fare' and store it in train_data
     # First: get the 'fare' and 'pclass' data
-    # Convert fare to 0 if NaN or '', so median can be computed
-    train_data["fare"] = train_data.fare.apply(lambda fare:
-                                               0 if (fare == '' or pd.isna(fare))
-                                               else float(fare))
-    # Assign median fare to each pclass group (3 groups)
-    median_fare = train_data.groupby(["pclass"])["fare"].median(skipna=False)
-    train_data["fare"] = train_data.apply(lambda row:
-                                          median_fare[row["pclass"]],
-                                          axis=1)
+    # Convert 'fare' to float, empty values to 0
+    df["fare"] = df.fare.apply(lambda fare: 0 if fare == '' else float(fare))
+    median_fare = df.groupby(["pclass"])["fare"].median(skipna=True)
+    df["fare"] = df.apply(lambda row: 0 if row["fare"] == 0 else median_fare[row["pclass"]],axis = 1)
+    return df
 
+
+def prepare_embarked(df):
     # EMBARKED: Prepare data 'embarked' and store it in train_data
     # First: get the most common 'embarked' value
-    embarked_data = train_data.groupby("embarked").size().reset_index(name='N')
-    mc_embarked = (embarked_data
-                   .embarked[embarked_data.N == max(embarked_data.N)])
-    # extract single value, else the below lambda function does not work
-    mc_embarked = mc_embarked.values[0]
+    embarked_data = df.groupby("embarked").size().reset_index(name='N')
+    mc_embarked = embarked_data.embarked[embarked_data.N == max(embarked_data.N)]
 
     # Second: replace empty entries with the most common 'embarked' value
-    train_data["embarked"] = (train_data
-                              .embarked
-                              .apply(lambda embarked:
-                                     mc_embarked if (embarked == '' or pd.isna(embarked))
-                                     else embarked))
+
+    df["embarked"] = df.embarked.apply(lambda embarked: mc_embarked if embarked == '' else embarked)
 
     # Third: convert all 'embarked' values to int
 
-    train_data["embarked"] = pd.Categorical(train_data.embarked)
-    train_data["embarked"] = train_data.embarked.cat.codes
-    return train_data
-
-
-def get_training_cols():
-    """
-    """
-    return ["survived",
-            "pclass",
-            "sibsp",
-            "parch",
-            "sex",
-            "age",
-            "fare",
-            "embarked"]
-
-
-def get_predict_cols():
-    """
-    """
-    return list(set(get_training_cols()) - {"survived"})
+    df["embarked"] = pd.Categorical(df.embarked)
+    df["embarked"] = df.embarked.cat.codes
+    return df
