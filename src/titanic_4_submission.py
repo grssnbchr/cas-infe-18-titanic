@@ -31,7 +31,8 @@ df_data = th.prepare_data(df_data)
 # the test!
 print('Training...')
 
-predictors = ["pclass", "sibsp", "parch", "sex", "age", "fare", "embarked"]
+predictors = ["pclass", "sibsp", "parch", "sex",
+              "age", "fare", "embarked", "boat", "body"]
 
 # fit a random forest
 forest = RandomForestClassifier(n_estimators=100)
