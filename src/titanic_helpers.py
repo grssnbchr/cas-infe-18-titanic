@@ -85,6 +85,7 @@ def prepare_data(df):
     df = prepare_age(df)
     df = prepare_fare(df)
     df = prepare_embarked(df)
+    df = prepare_boat(df)
     return df
 
 
@@ -147,4 +148,9 @@ def prepare_embarked(df):
 
     df["embarked"] = pd.Categorical(df.embarked)
     df["embarked"] = df.embarked.cat.codes
+    return df
+
+def prepare_boat(df):
+    # boat: Prepare data 'boat' and store it in df
+    df['boat'] = df.boat.astype(str)
     return df
