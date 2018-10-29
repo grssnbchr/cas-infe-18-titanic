@@ -174,7 +174,6 @@ def prepare_body(df):
     # boat: Prepare data 'boat' and store it in df
     df['body'] = pd.Categorical(df.body)
     df['body'] = df.body.cat.codes
-
     return df
 
 

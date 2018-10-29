@@ -1,5 +1,6 @@
 .idea
 src/*.csv
+src/.ipynb_checkpoints
 src/__pycache__
 output/*.csv
 venv
