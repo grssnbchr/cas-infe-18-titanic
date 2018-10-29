@@ -37,7 +37,7 @@ df_data = th.prepare_data(df_data)
 print('Training...')
 forest = RandomForestClassifier(n_estimators=100)
 # Build a forest of trees from the training set (X, y)
-predictors = ["pclass", "sibsp", "parch", "sex", "age", "fare", "embarked"]
+predictors = ["pclass", "sibsp", "parch", "sex", "age", "fare", "embarked", "boat"]
 forest = (forest
           .fit(df_data[df_data['dataset'] == 'train'][predictors],
                df_data[df_data['dataset'] == 'train']["survived"].astype(int))
