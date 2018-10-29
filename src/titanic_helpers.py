@@ -86,6 +86,7 @@ def prepare_data(df):
     df = prepare_fare(df)
     df = prepare_embarked(df)
     df = prepare_boat(df)
+    df = prepare_body(df)
     return df
 
 
@@ -161,5 +162,18 @@ def prepare_embarked(df):
 
 def prepare_boat(df):
     # boat: Prepare data 'boat' and store it in df
-    df['boat'] = df.boat.astype(str)
+    #df['boat'] = df.boat.astype(str)
+    #boat_data = df.groupby('boat').size().reset_index(name='N')
+    df['boat'] = pd.Categorical(df.boat)
+    df['boat'] = df.boat.cat.codes
+
+    return df
+
+def prepare_body(df):
+    # boat: Prepare data 'boat' and store it in df
+    #df['boat'] = df.boat.astype(str)
+    #boat_data = df.groupby('boat').size().reset_index(name='N')
+    df['body'] = pd.Categorical(df.body)
+    df['body'] = df.body.cat.codes
+
     return df
