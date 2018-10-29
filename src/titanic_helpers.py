@@ -87,6 +87,7 @@ def prepare_data(df):
     df = prepare_embarked(df)
     df = prepare_boat(df)
     df = prepare_body(df)
+    df = prepare_title(df)
     return df
 
 
@@ -171,9 +172,15 @@ def prepare_boat(df):
 
 def prepare_body(df):
     # boat: Prepare data 'boat' and store it in df
-    #df['boat'] = df.boat.astype(str)
-    #boat_data = df.groupby('boat').size().reset_index(name='N')
     df['body'] = pd.Categorical(df.body)
     df['body'] = df.body.cat.codes
 
+    return df
+
+
+def prepare_title(df):
+    #perpare title
+    df['title_text'] = df.surname.str.extract(r'(\w+\.)')
+    df['title'] = pd.Categorical(df.title_text)
+    df['title'] = df.title.cat.codes
     return df
