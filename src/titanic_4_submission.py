@@ -14,9 +14,6 @@ orig_train_data = pd.read_csv(trainFile, delimiter=";")
 train_data = orig_train_data.copy()
 train_data['dataset'] = 'train'
 
-#train_data = train_data[["survived","pclass","sibsp","parch","sex","age","fare","embarked"]]
-#train_data = th.prepare_data(train_data)
-
 # PART 2: PREPARING THE TEST DATA
 
 # Now we have to do the same for the test data as we did for the training data
@@ -27,13 +24,11 @@ orig_test_data = pd.read_csv(testFile, delimiter=";")
 test_data = orig_test_data.copy()
 test_data['dataset'] = 'test'
 test_data['survived'] = None
-#test_data = test_data[["pclass","sibsp","parch","sex","age","fare","embarked"]]
-#test_data = th.prepare_data(test_data)
 
-df_data = test_data.append(train_data,ignore_index=False, sort=False)
+df_data = test_data.append(train_data, ignore_index=False, sort=False)
 df_data = th.prepare_data(df_data)
+
 # After the training and test data is created, collect the test data's ids
-#test_ids = orig_test_data["id"]
 
 # PART 3: TRAINING AND PREDICTION
 
@@ -42,16 +37,19 @@ df_data = th.prepare_data(df_data)
 print('Training...')
 forest = RandomForestClassifier(n_estimators=100)
 # Build a forest of trees from the training set (X, y)
-predictors = ["pclass","sibsp","parch","sex","age","fare","embarked"]
-forest = forest.fit(df_data[df_data['dataset'] == 'train'][predictors], df_data[df_data['dataset'] == 'train']["survived"].astype(int))
+predictors = ["pclass", "sibsp", "parch", "sex", "age", "fare", "embarked"]
+forest = (forest
+          .fit(df_data[df_data['dataset'] == 'train'][predictors],
+               df_data[df_data['dataset'] == 'train']["survived"].astype(int))
+          )
 
 print('Predicting...')
-output = forest.predict(df_data[df_data['dataset'] == 'test'][predictors]).astype(np.float)
+output = forest.predict(df_data[df_data['dataset'] == 'test'][predictors])
 
 # Create DataFrame for outputfile
-df = pd.DataFrame(columns = ["id","survived"])
+df = pd.DataFrame(columns=["id", "survived"])
 df["id"] = df_data[df_data['dataset'] == 'test']['id']
-df["survived"] = output.astype(int)
+df["survived"] = output
 
 # Write the data into a file
 th.write_csv(df=df)

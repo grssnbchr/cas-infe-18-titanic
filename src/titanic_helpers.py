@@ -108,18 +108,20 @@ def prepare_sex(df):
     df["sex"] = df.apply(lambda row: sex_transformation(row), axis=1)
     return df
 
+
 def prepare_age(df):
     # AGE: Prepare data 'age' and store it in train_data
     # First: get the median age
     # Convert 'age' to float, empty values to 0
     df["age"] = df.age.apply(lambda age:
-                                             np.nan if (age == '' or pd.isna(age))
-                                             else float(age))
-    median_age = df["age"].median(skipna = True )
-    #store median age if age is undefined
+                             np.nan if (age == '' or pd.isna(age))
+                             else float(age))
+    median_age = df["age"].median(skipna=True)
+
+    # store median age if age is undefined
     df["age"] = df.age.apply(lambda age:
-                                             median_age if (age == '' or pd.isna(age))
-                                             else age)
+                             median_age if (age == '' or pd.isna(age))
+                             else age)
     return df
 
 
@@ -129,7 +131,9 @@ def prepare_fare(df):
     # Convert 'fare' to float, empty values to 0
     df["fare"] = df.fare.apply(lambda fare: 0 if fare == '' else float(fare))
     median_fare = df.groupby(["pclass"])["fare"].median(skipna=True)
-    df["fare"] = df.apply(lambda row: 0 if row["fare"] == 0 else median_fare[row["pclass"]],axis = 1)
+    df["fare"] = df.apply(lambda row:
+                          0 if row["fare"] == 0
+                          else median_fare[row["pclass"]], axis=1)
     return df
 
 
@@ -137,11 +141,15 @@ def prepare_embarked(df):
     # EMBARKED: Prepare data 'embarked' and store it in train_data
     # First: get the most common 'embarked' value
     embarked_data = df.groupby("embarked").size().reset_index(name='N')
-    mc_embarked = embarked_data.embarked[embarked_data.N == max(embarked_data.N)]
+    mc_embarked = (embarked_data
+                   .embarked[embarked_data.N == max(embarked_data.N)]
+                   )
 
     # Second: replace empty entries with the most common 'embarked' value
 
-    df["embarked"] = df.embarked.apply(lambda embarked: mc_embarked if embarked == '' else embarked)
+    df["embarked"] = df.embarked.apply(lambda embarked:
+                                       mc_embarked if embarked == ''
+                                       else embarked)
 
     # Third: convert all 'embarked' values to int
 
