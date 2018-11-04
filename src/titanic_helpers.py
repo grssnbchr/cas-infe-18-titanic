@@ -43,7 +43,7 @@ def submit_answer(df, custom_name='submission'):
     :param df: df with id and survived columns:
     :param custom_name: a name to append after team name, e.g. random_forest
         (should not contain whitespace)
-    :return:
+    :return: current score as a float
     '''
     assert isinstance(df, pd.DataFrame)
     df_text = df[['id', 'survived']].to_csv(sep=';',
@@ -74,6 +74,8 @@ def submit_answer(df, custom_name='submission'):
               f' (position: {groups[1]})')
         print(f'current highscore: {round(float(highscore_groups[2]), 3)}'
               f' by "{highscore_groups[1]}"')
+
+        return float(groups[2])
 
     except Exception as e:
         print(f'error: {e}')
